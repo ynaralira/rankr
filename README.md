@@ -1,4 +1,4 @@
-# CodeQuest 🗡️
+# Rankr 🗡️
 
 **Level up your code**
 
