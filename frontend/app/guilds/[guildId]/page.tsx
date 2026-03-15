@@ -7,7 +7,8 @@ import { fetcher } from '@/lib/swrFetcher';
 
 export default function GuildProfilePage() {
   const { guildId } = useParams();
-  const { data, isLoading } = useSWR(guildId ? `http://localhost:5000/api/guilds/${guildId}` : null, fetcher);
+  const { API_URL } = require('../../lib/api');
+  const { data, isLoading } = useSWR(guildId ? `${API_URL}/guilds/${guildId}` : null, fetcher);
   const guild = data || {};
   const [requestSent, setRequestSent] = React.useState(false);
   // Layout inspirado no exemplo fornecido

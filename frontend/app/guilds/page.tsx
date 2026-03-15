@@ -16,7 +16,8 @@ interface Guild {
 }
 
 export default function GuildsPage() {
-  const { data: guilds, isLoading, mutate } = useSWR<Guild[]>("http://localhost:5000/api/guilds", fetcher);
+  const { API_URL } = require('../../lib/api');
+  const { data: guilds, isLoading, mutate } = useSWR<Guild[]>(`${API_URL}/guilds`, fetcher);
 
   // Importação dinâmica do Navbar
   const Navbar = require('../../components/Navbar').default;

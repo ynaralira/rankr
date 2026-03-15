@@ -16,7 +16,8 @@ export default function ArenaDetailPage({ params }: { params: { id: string } }) 
     // Função para inscrição
     const handleInscrever = async () => {
       try {
-        const res = await fetch(`http://localhost:5000/api/arenas/${params.id}/enroll`, {
+        const { API_URL } = require('../../../lib/api');
+        const res = await fetch(`${API_URL}/arenas/${params.id}/enroll`, {
           method: 'POST',
           credentials: 'include',
         });
@@ -34,7 +35,7 @@ export default function ArenaDetailPage({ params }: { params: { id: string } }) 
       if (file) formData.append('file', file);
       formData.append('githubUrl', githubUrl);
       try {
-        const res = await fetch(`http://localhost:5000/api/arenas/${params.id}/challenges/${challengeId}/submit`, {
+        const res = await fetch(`${API_URL}/arenas/${params.id}/challenges/${challengeId}/submit`, {
           method: 'POST',
           body: formData,
           credentials: 'include',
@@ -60,7 +61,7 @@ export default function ArenaDetailPage({ params }: { params: { id: string } }) 
 
   const fetchArena = () => {
     setLoading(true);
-    fetch(`http://localhost:5000/api/arenas/${params.id}`)
+    fetch(`${API_URL}/arenas/${params.id}`)
       .then(res => res.json())
       .then(data => {
         setArena(data);
@@ -69,12 +70,12 @@ export default function ArenaDetailPage({ params }: { params: { id: string } }) 
   };
 
   const fetchChallenges = async () => {
-    const res = await fetch(`http://localhost:5000/api/arenas/${params.id}/challenges`);
+    const res = await fetch(`${API_URL}/arenas/${params.id}/challenges`);
     setChallenges(await res.json());
   };
 
   const fetchRanking = async () => {
-    const res = await fetch(`http://localhost:5000/api/arenas/${params.id}/ranking`);
+    const res = await fetch(`${API_URL}/arenas/${params.id}/ranking`);
     setRanking(await res.json());
   };
 

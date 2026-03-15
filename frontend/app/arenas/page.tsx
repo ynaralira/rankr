@@ -20,7 +20,8 @@ function ArenaCreateForm({ onCreated }: { onCreated?: () => void }) {
     e.preventDefault();
     setLoading(true);
     setError('');
-    const res = await fetch('http://localhost:5000/api/arenas', {
+    const { API_URL } = require('../../lib/api');
+    const res = await fetch(`${API_URL}/arenas`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ name, description }),
@@ -57,7 +58,8 @@ function ArenaCreateForm({ onCreated }: { onCreated?: () => void }) {
 }
 
 export default function ArenasPage() {
-  const { data: arenas, isLoading, mutate } = useSWR<Arena[]>('http://localhost:5000/api/arenas', fetcher);
+  const { API_URL } = require('../../lib/api');
+  const { data: arenas, isLoading, mutate } = useSWR<Arena[]>(`${API_URL}/arenas`, fetcher);
 
   const [showForm, setShowForm] = React.useState(false);
   const [search, setSearch] = React.useState('');

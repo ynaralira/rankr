@@ -20,7 +20,8 @@ export default function GuildCreateForm({ onCreated }: { onCreated?: () => void 
     formData.append('leaderId', leaderId);
     formData.append('viceLeaderId', viceLeaderId);
     if (logo) formData.append('logo', logo);
-    const res = await fetch('http://localhost:5000/api/guilds', {
+    const { API_URL } = require('../lib/api');
+    const res = await fetch(`${API_URL}/guilds`, {
       method: 'POST',
       body: formData,
     });

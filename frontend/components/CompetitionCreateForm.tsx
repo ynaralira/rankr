@@ -8,7 +8,8 @@ export default function CompetitionCreateForm({ arenaId, onCreated }: { arenaId:
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   // ...existing code...
-  const { data: guilds, isLoading } = useSWR('http://localhost:5000/api/guilds', fetcher);
+  const { API_URL } = require('../lib/api');
+  const { data: guilds, isLoading } = useSWR(`${API_URL}/guilds`, fetcher);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -19,7 +20,7 @@ export default function CompetitionCreateForm({ arenaId, onCreated }: { arenaId:
       setLoading(false);
       return;
     }
-    const res = await fetch('http://localhost:5000/api/arenas/competition', {
+    const res = await fetch(`${API_URL}/arenas/competition`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ arenaId, guildIds: selectedGuilds, prize }),
