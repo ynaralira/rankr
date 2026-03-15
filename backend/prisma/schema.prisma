@@ -1,0 +1,248 @@
+model Character {
+  id        String   @id @default(cuid())
+  name      String
+  avatar    String?
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  xp        Int      @default(0)
+  level     Int      @default(1)
+  createdAt DateTime @default(now())
+  // Adicione outros atributos do personagem conforme necessário
+}
+model Guild {
+  id        String   @id @default(cuid())
+  name      String   @unique
+  description String?
+  createdAt DateTime @default(now())
+  leaderId  String
+  viceLeaderId String?
+  members   GuildMember[]
+  arenas    Arena[]
+}
+
+model GuildMember {
+  id        String   @id @default(cuid())
+  userId    String
+  guildId   String
+  role      String   // 'leader', 'vice-leader', 'member'
+  joinedAt  DateTime @default(now())
+  guild     Guild    @relation(fields: [guildId], references: [id])
+}
+
+model Arena {
+  id        String   @id @default(cuid())
+  name      String   @unique
+  description String?
+  createdAt DateTime @default(now())
+  guilds    Guild[]
+  competitions Competition[]
+  participants User[] @relation("ArenaParticipants")
+  challenges Challenge[] @relation("ArenaChallenges")
+}
+
+model Competition {
+  id        String   @id @default(cuid())
+  arenaId   String
+  guildAId  String
+  guildBId  String
+  winnerId  String?
+  prize     String?
+  date      DateTime @default(now())
+  arena     Arena    @relation(fields: [arenaId], references: [id])
+}
+
+model ChallengeLevel {
+  id        String   @id @default(cuid())
+  challengeId String
+  level     Int
+  description String?
+  xpReward  Int
+  challenge Challenge @relation(fields: [challengeId], references: [id])
+}
+// Prisma schema para CodeQuest
+// Ajuste os models conforme necessário
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String    @id @default(cuid())
+  email         String    @unique
+  username      String    @unique
+  password      String
+  avatar        String?
+  bio           String?
+  techStack     String[]  @default([])
+  xp            Int       @default(0)
+  level         Int       @default(1)
+  referralCode  String?
+  referredBy    String?
+  referralCount Int       @default(0)
+  referralXP    Int       @default(0)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  accessories   UserAccessory[]
+  posts        Post[]
+  comments     Comment[]
+  likes        Like[]
+  projects     Project[]
+  jobApplications JobApplication[]
+  userBadges   UserBadge[]
+  challengeSubmissions ChallengeSubmission[]
+  arenas Arena[] @relation("ArenaParticipants")
+  followers    Follow[] @relation("Following")
+  following    Follow[] @relation("Follower")
+  characters   Character[]
+}
+
+model Badge {
+  id        String   @id @default(cuid())
+  name      String   @unique
+  icon      String
+  xpReward  Int
+  userBadges UserBadge[]
+}
+
+model Challenge {
+  id        String   @id @default(cuid())
+  title     String
+  content   String
+  xpReward  Int
+  endDate   DateTime
+  level     Int?
+  instructions Json?
+  createdAt DateTime @default(now())
+  submissions ChallengeSubmission[]
+  levels ChallengeLevel[]
+  arena Arena? @relation("ArenaChallenges", fields: [arenaId], references: [id])
+  arenaId String?
+}
+
+model Accessory {
+  id        String   @id @default(cuid())
+  name      String   @unique
+  icon      String
+  levelRequired Int @default(1)
+  type      String
+  userAccessories UserAccessory[]
+}
+
+model Project {
+  id          String   @id @default(cuid())
+  name        String
+  description String
+  techStack   String[] @default([])
+  githubLink  String?
+  demoLink    String?
+  userId      String
+  createdAt   DateTime @default(now())
+  user        User     @relation(fields: [userId], references: [id])
+  level       Int?
+}
+
+model Post {
+  id          String   @id @default(cuid())
+  content     String
+  codeSnippet String?
+  userId      String
+  createdAt   DateTime @default(now())
+  user        User     @relation(fields: [userId], references: [id])
+  comments    Comment[]
+  likes       Like[]
+}
+
+model Comment {
+  id        String   @id @default(cuid())
+  content   String
+  postId    String
+  userId    String
+  createdAt DateTime @default(now())
+  post      Post     @relation(fields: [postId], references: [id])
+  user      User     @relation(fields: [userId], references: [id])
+}
+
+model Like {
+  id        String   @id @default(cuid())
+  postId    String
+  userId    String
+  createdAt DateTime @default(now())
+  post      Post     @relation(fields: [postId], references: [id])
+  user      User     @relation(fields: [userId], references: [id])
+  @@unique([postId, userId])
+}
+
+model Job {
+  id          String   @id @default(cuid())
+  companyName String
+  jobTitle    String
+  description String
+  techStack   String[] @default([])
+  location    String?
+  isRemote    Boolean  @default(false)
+  salaryMin   Int?
+  salaryMax   Int?
+  createdAt   DateTime @default(now())
+  applications JobApplication[]
+}
+
+model JobApplication {
+  id         String   @id @default(cuid())
+  jobId      String
+  userId     String
+  coverLetter String?
+  status     String   @default("pending")
+  createdAt  DateTime @default(now())
+  job        Job      @relation(fields: [jobId], references: [id])
+  user       User     @relation(fields: [userId], references: [id])
+  @@unique([jobId, userId])
+}
+
+model UserBadge {
+  id        String   @id @default(cuid())
+  userId    String
+  badgeId   String
+  earnedAt  DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id])
+  badge     Badge    @relation(fields: [badgeId], references: [id])
+}
+
+model ChallengeSubmission {
+  id          String   @id @default(cuid())
+  challengeId String
+  userId      String
+  solution    String
+  githubUrl   String?
+  fileUrl     String?
+  status      String   @default("pending")
+  createdAt   DateTime @default(now())
+  challenge   Challenge @relation(fields: [challengeId], references: [id])
+  user        User      @relation(fields: [userId], references: [id])
+  @@unique([challengeId, userId])
+}
+
+model Follow {
+  id          String   @id @default(cuid())
+  followerId  String
+  followingId String
+  createdAt   DateTime @default(now())
+  follower    User     @relation("Follower", fields: [followerId], references: [id])
+  following   User     @relation("Following", fields: [followingId], references: [id])
+  @@unique([followerId, followingId])
+}
+
+model UserAccessory {
+  id          String   @id @default(cuid())
+  userId      String
+  accessoryId String
+  isEquipped  Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  user        User     @relation(fields: [userId], references: [id])
+  accessory   Accessory @relation(fields: [accessoryId], references: [id])
+  @@unique([userId, accessoryId])
+}
